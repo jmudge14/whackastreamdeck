@@ -157,7 +157,7 @@ class MoleGame():
 
 if __name__ == "__main__":
     deck = Deck.getInitializedDeck(background="green");
-    game = MoleGame(deck, gameTime=10000)
+    game = MoleGame(deck)
     print("Good luck!")
     while game.storyboard != "quit":
         #game.update()
