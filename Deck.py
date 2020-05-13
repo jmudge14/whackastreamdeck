@@ -6,9 +6,10 @@
 #
 
 import os
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 from StreamDeck.DeviceManager import DeviceManager
 from StreamDeck.ImageHelpers import PILHelper
+from itertools import zip_longest
 
 # Folder location of image assets used by this example.
 ASSETS_PATH = os.path.join(os.path.dirname(__file__), "Assets")
@@ -27,6 +28,32 @@ def getAsset(deck, assetFilename):
     image.paste(icon, icon_pos, icon)
 
     return PILHelper.to_native_format(deck, image)
+
+characterAssets = {}
+FONT_NAME = "Viafont.ttf"
+def getCharacterAsset(deck, character, background='black', color='white'):
+    if character in characterAssets:
+        return characterAssets[character]
+
+    image = PILHelper.create_image(deck,background=background)
+
+    # Load a custom TrueType font and use it to overlay the key index, draw key
+    # label onto the image.
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.truetype(os.path.join(ASSETS_PATH, FONT_NAME), 96)
+    label_w, label_h = draw.textsize(character, font=font)
+    label_pos = (0,0) #((image.width - label_w) // 2, image.height - 20)
+    draw.text(label_pos, text=character, font=font, fill=color)
+
+    nativeImage = PILHelper.to_native_format(deck, image)
+    characterAssets[character] = nativeImage
+    return nativeImage
+
+def renderString(deck, string, background='black', color='white'):
+    maxLen = deck.key_count()
+    if len(string) > maxLen: raise ValueError("String length exceeds StreamDeck key count")
+    for char, key in zip_longest(string, range(maxLen)):
+        deck.set_key_image(key, getCharacterAsset(deck, char or ' ', background=background, color=color))
 
 def getInitializedDeck(initBrightness=30,deviceNum=0,background='black'):
     """ Initialize and return the first stream deck device or None. """
