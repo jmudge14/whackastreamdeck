@@ -131,6 +131,7 @@ class MoleGame():
                 this.storyboard = "quit"
                 deck.reset()
                 deck.close()
+            this.redraw()
             return
         elif this.storyboard == "notstarted":
             this.start()
