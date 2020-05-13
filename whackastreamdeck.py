@@ -10,7 +10,7 @@ import threading
 
 
 class MoleGame():
-    def __init__(this, deck, numMoles=3, minDelay=500, maxDelay=1000, explosionDisplayTime=500, gameTime=6000): # Initial State
+    def __init__(this, deck, numMoles=3, minDelay=500, maxDelay=1000, explosionDisplayTime=500, gameTime=60000): # Initial State
         this.hill = []
         this.deck = deck
         this.numMoles = numMoles
