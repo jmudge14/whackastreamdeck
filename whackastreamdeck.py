@@ -7,6 +7,7 @@ from random import randint
 from time import time
 from time import sleep
 import threading
+import os
 
 
 class MoleGame():
@@ -163,6 +164,19 @@ if __name__ == "__main__":
         #game.update()
         sleep(0.1)
     print("Score: " + str(game.score))
+    HIGH_SCORE_FILE = os.path.join(os.path.dirname(__file__), "highscores")
+    if os.path.exists(HIGH_SCORE_FILE):
+        with open(HIGH_SCORE_FILE,"r") as highScoreFile:
+            high_scores = eval(highScoreFile.read())
+    else:
+        high_scores = []
+    high_scores.append(game.score)
+    high_scores.sort(reverse=True)
+    high_scores = high_scores[:10] # keep ten scores
+    print("High Scores:")
+    print("\n".join([str(s) for s in high_scores]))
+    with open(HIGH_SCORE_FILE, "w") as highScoreFile:
+        highScoreFile.write(repr(high_scores))
 
 
 
