@@ -32,43 +32,51 @@ class MoleGame():
         this.blankImage = Deck.getAsset(deck, "Blank.jpeg")
         this.explosionImage = Deck.getAsset(deck, "Explosion.jpeg")
 
-        # Thread management
+        # Process management
         this.updateLock = threading.Lock()
+
+        def keyCallback(deck, key, state):
+            this.keyCallback(key,state)
+        this.deck.set_key_callback(keyCallback)
 
         # Storyboard Management
         this.storyboard = "notstarted"
 
+        this.redraw()
+
+    def tick(this):
+        this.update()
+        this.redraw()
+        if this.storyboard != "gameover":
+            threading.Timer((randint(this.minDelay, this.maxDelay)/1000.0), this.tick).start()
 
     def randbutton(this):
         return randint(0, this.deck.key_count()-1)
 
     def start(this):
-        def keyCallback(deck, key, state):
-            this.keyCallback(key,state)
-        this.deck.set_key_callback(keyCallback)
         # Mole positions are randomized in update()
+        this.storyboard = "started"
         this.nextUpdateTime = -1 # Force initial update
         this.startTime = time()
-        this.gameOverTime = this.startTime+this.gameTime
-        this.storyboard = "started"
-        this.update()
+        this.gameOverTime = this.startTime+(this.gameTime/1000)
+        this.tick() # set everything in motion!
 
     def duration(this):
         return time()-this.startTime
 
     def update(this):
+        if this.storyboard != "started":
+            return
+
         t = time()
-        # Expire stale explosions
-        for explosion in this.explosions:
-            if t>explosion[1]:
-                this.explosions.remove(explosion)
         # Check if any further updates are required
         if t>this.gameOverTime:
-            this.storyboard="gameover"
-        elif t>this.nextUpdateTime:
-            this.nextUpdateTime = t+(randint(this.minDelay, this.maxDelay)/1000.0)
-        else:
+            this.storyboard = "gameover"
             return
+        #elif t>this.nextUpdateTime:
+        #    this.nextUpdateTime = t+(randint(this.minDelay, this.maxDelay)/1000.0)
+        #else:
+        #    return
 
         # Populate the mole hill with new moles
         this.updateLock.acquire()
@@ -81,30 +89,51 @@ class MoleGame():
                 nextMole = this.randbutton()
             nextHill.append(nextMole)
             # Remove any covered explosions from the list
-            for e in this.explosions:
-                if e[0] == nextMole:
-                    this.explosions.remove(e)
-                    break
+            try:
+                this.explosions.remove(nextMole)
+            except ValueError:
+                pass
+
         this.hill = nextHill
         this.updateLock.release()
         this.redraw()
 
     def redraw(this):
-        for key in range(this.deck.key_count()):
-            if key in this.hill:
-                image = this.moleImage
-            elif key in [e[0] for e in this.explosions]:
-                image = this.explosionImage
-            else:
-                image = this.blankImage
-            this.deck.set_key_image(key, image)
+        if this.storyboard == "notstarted":
+            Deck.renderString(this.deck, " PRESS   KEY TO  START", background="black", color="white")
+        elif this.storyboard == "gameover":
+            Deck.renderString(this.deck, "GAME    OVER.   SCORE:  {}".format(this.score))
+        else:
+            for key in range(this.deck.key_count()):
+                if key in this.hill:
+                    image = this.moleImage
+                elif key in this.explosions:
+                    image = this.explosionImage
+                else:
+                    image = this.blankImage
+                this.deck.set_key_image(key, image)
 
+
+    def removeExplosion(this, key):
+        this.updateLock.acquire()
+        try:
+            this.explosions.remove(key)
+        except ValueError:
+            pass
+        this.updateLock.release()
 
     def keyCallback(this, key, state):
-        if this.storyboard = "gameover":
+        if not state: 
             return
-
-        if state and key in this.hill:
+        if this.storyboard in ("gameover", "quit"):
+            if key == 7:
+                this.storyboard = "quit"
+                deck.reset()
+                deck.close()
+            return
+        elif this.storyboard == "notstarted":
+            this.start()
+        elif key in this.hill:
             this.updateLock.acquire()
 
             this.score += 1
@@ -116,9 +145,10 @@ class MoleGame():
             this.hill.append(nextMole)
 
             # Display an explosion icon for some time
-            this.explosions.append((key,time()+(this.explosionDisplayTime/1000.0)))
-
+            this.explosions.append(key)
             this.updateLock.release()
+
+            threading.Timer(this.explosionDisplayTime/1000.0, this.removeExplosion, args=(key,)).start()
 
             this.redraw()
 
@@ -127,14 +157,12 @@ class MoleGame():
 
 if __name__ == "__main__":
     deck = Deck.getInitializedDeck(background="green");
-    game = MoleGame(deck, explosionDisplayTime=10000)
+    game = MoleGame(deck, gameTime=10000)
     print("Good luck!")
-    game.start()
-    while game.duration() < 20:
-        game.update()
+    while game.storyboard != "quit":
+        #game.update()
         sleep(0.1)
     print("Score: " + str(game.score))
-    deck.close()
 
 
 
