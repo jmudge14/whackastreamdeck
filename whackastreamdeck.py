@@ -103,7 +103,7 @@ class MoleGame():
         if this.storyboard == "notstarted":
             Deck.renderString(this.deck, " PRESS   KEY TO  START", background="black", color="white")
         elif this.storyboard == "gameover":
-            Deck.renderString(this.deck, "GAME    OVER.   SCORE:  {}".format(this.score))
+            Deck.renderString(this.deck, "GAME   XOVER.   SCORE:  {}".format(this.score))
         else:
             for key in range(this.deck.key_count()):
                 if key in this.hill:
