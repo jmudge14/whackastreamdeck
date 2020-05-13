@@ -1,0 +1,13 @@
+Whack-a-mole game for Elgato Stream Deck
+Jack Mudge
+
+Dependencies:
+1. pip install streamdeck pillow
+2. Follow the streamdeck library installation instructions, particularly
+   for USB backend permissions. See:
+    https://python-elgato-streamdeck.readthedocs.io/en/latest/pages/backend_libusb.html
+
+3. Obviously, you will need a StreamDeck. This game assumes the first attached StreamDeck is the interesting one.
+
+
+
