@@ -12,7 +12,7 @@ from StreamDeck.ImageHelpers import PILHelper
 from itertools import zip_longest
 
 # Folder location of image assets used by this example.
-ASSETS_PATH = os.path.join(os.path.dirname(__file__), "Assets")
+ASSETS_PATH = os.path.join(os.path.dirname(__file__), "..", "Assets")
 
 def getAsset(deck, assetFilename):
     """ Load an image asset from the given filename. 

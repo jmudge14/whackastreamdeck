@@ -2,7 +2,7 @@
 # Author: Jack Mudge <jack@mudge.dev>
 # 
 
-import Deck
+import whackastreamdeck.Deck as Deck
 from random import randint
 from time import time
 from time import sleep
