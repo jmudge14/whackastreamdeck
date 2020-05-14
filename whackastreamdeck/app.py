@@ -35,6 +35,7 @@ class MoleGame():
 
         # Process management
         this.updateLock = threading.Lock()
+        this.drawLock = threading.Lock()
 
         def keyCallback(deck, key, state):
             this.keyCallback(key,state)
@@ -100,19 +101,20 @@ class MoleGame():
         this.redraw()
 
     def redraw(this):
-        if this.storyboard == "notstarted":
-            Deck.renderString(this.deck, " PRESS   KEY TO  START", background="black", color="white")
-        elif this.storyboard == "gameover":
-            Deck.renderString(this.deck, "GAME   XOVER.   SCORE:  {}".format(this.score))
-        else:
-            for key in range(this.deck.key_count()):
-                if key in this.hill:
-                    image = this.moleImage
-                elif key in this.explosions:
-                    image = this.explosionImage
-                else:
-                    image = this.blankImage
-                this.deck.set_key_image(key, image)
+        with this.drawLock:
+            if this.storyboard == "notstarted":
+                Deck.renderString(this.deck, " PRESS   KEY TO  START", background="black", color="white")
+            elif this.storyboard == "gameover":
+                Deck.renderString(this.deck, "GAME   XOVER.   SCORE:  {}".format(this.score))
+            else:
+                for key in range(this.deck.key_count()):
+                    if key in this.hill:
+                        image = this.moleImage
+                    elif key in this.explosions:
+                        image = this.explosionImage
+                    else:
+                        image = this.blankImage
+                    this.deck.set_key_image(key, image)
 
 
     def removeExplosion(this, key):
@@ -122,6 +124,7 @@ class MoleGame():
         except ValueError:
             pass
         this.updateLock.release()
+        this.redraw()
 
     def keyCallback(this, key, state):
         if not state: 
@@ -155,15 +158,7 @@ class MoleGame():
             this.redraw()
 
 
-
-
-if __name__ == "__main__":
-    deck = Deck.getInitializedDeck(background="green");
-    game = MoleGame(deck)
-    print("Good luck!")
-    while game.storyboard != "quit":
-        #game.update()
-        sleep(0.1)
+def printAndSaveHighScores(score):
     print("Score: " + str(game.score))
     HIGH_SCORE_FILE = os.path.join(os.path.dirname(__file__), "highscores")
     if os.path.exists(HIGH_SCORE_FILE):
@@ -180,4 +175,11 @@ if __name__ == "__main__":
         highScoreFile.write(repr(high_scores))
 
 
+def run():
+    deck = Deck.getInitializedDeck(background="green");
+    game = MoleGame(deck)
+    print("Good luck!")
+    while game.storyboard != "quit":
+        #game.update()
+        sleep(0.1)
 
