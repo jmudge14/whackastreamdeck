@@ -1,3 +1,3 @@
-import whackastreamdeck.app
+import whackastreamdeck.app as app
 app.run()
 
