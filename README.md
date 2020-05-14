@@ -25,13 +25,13 @@ The game will ask you to press a key to start, and run for one minute. At the en
 
 Unless otherwise stated below, all contents Copyright (C) Jack Mudge and released under MIT terms, see LICENSE.
 
-Font "ViaFont" (Assets/ViaFont.zip and .ttf) 
-    Source: http://www.publicdomainfiles.com/show_file.php?id=13949894425072
+Font "ViaFont" (Assets/ViaFont.zip and .ttf)  
+    Source: http://www.publicdomainfiles.com/show_file.php?id=13949894425072  
     License: Public Domain
 
-Deck.py:
-    Steals heavily from StreamDeck library examples.
-    Source: https://github.com/abcminiuser/python-elgato-streamdeck
+Deck.py:  
+    Steals heavily from StreamDeck library examples.  
+    Source: https://github.com/abcminiuser/python-elgato-streamdeck  
     License: MIT
 
 # Revision History
