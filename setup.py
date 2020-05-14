@@ -15,6 +15,7 @@ setup(
             "streamdeck",
             "pillow"
         ],
+        package_data={'whackastreamdeck': ['Assets/*']},
 )
         
 
