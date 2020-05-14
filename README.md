@@ -17,7 +17,7 @@ Author: Jack Mudge <jack@mudge.dev>
 
 Clone the repository, install the dependencies as listed above, then run:
 
-`python3 whackastreamdeck.py`
+`python3 -m whackastreamdeck
 
 The game will ask you to press a key to start, and run for one minute. At the end of one minute, your score is the number of moles you successfully whacked. After the game, press 'X' (in the upper-right corner) to exit, after which high scores are printed to stdout.
 
